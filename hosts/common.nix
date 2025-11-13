@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, inputs, ... }: {
   wsl.enable = true;
   wsl.defaultUser = "neubaner";
 
@@ -27,4 +27,9 @@
   };
 
   virtualisation.docker.enable = true;
+
+  home-manager.useUserPackages = true;
+  home-manager.useGlobalPkgs = true;
+  home-manager.users.neubaner.imports =
+    [ inputs.catppuccin.homeModules.catppuccin ../home.nix ];
 }

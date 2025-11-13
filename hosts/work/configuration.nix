@@ -12,11 +12,7 @@
     };
   };
 
-  home-manager.useUserPackages = true;
-  home-manager.useGlobalPkgs = true;
   home-manager.users.neubaner.imports = [
-    ../../home.nix
-    inputs.catppuccin.homeModules.catppuccin
     inputs.sops-nix.homeManagerModules.sops
     ({ config, ... }: {
       sops = {
