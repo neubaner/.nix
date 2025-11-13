@@ -39,7 +39,12 @@
   programs.gh.enable = true;
   programs.jujutsu = {
     enable = true;
-    settings.ui.default-command = "log";
+    settings = {
+      ui.default-command = "log";
+      aliases.rebase-trunk =
+        [ "rebase" "-s" "needs_rebase()" "-d" "trunk()" "--skip-emptied" ];
+      revset-aliases."needs_rebase()" = "roots(trunk()..) & mutable() & mine()";
+    };
   };
 
   programs.neovim = {
