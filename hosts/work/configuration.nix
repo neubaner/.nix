@@ -19,8 +19,6 @@
     inputs.catppuccin.homeModules.catppuccin
     inputs.sops-nix.homeManagerModules.sops
     ({ config, ... }: {
-      imports = [ ../../modules/home/vcs.nix ];
-
       sops = {
         age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
         defaultSopsFile = ../../secrets/work.yaml;
@@ -46,9 +44,8 @@
         };
       };
 
-      vcs = {
-        enable = true;
-        git.includePath = config.sops.templates.git-config.path;
+      programs.git = {
+        includes = [{ path = config.sops.templates.git-config.path; }];
       };
     })
   ];

@@ -34,6 +34,14 @@
 
   home.sessionVariables = { MANPAGER = "nvim +Man!"; };
 
+  # NOTE: The user is configured in the host module
+  programs.git.enable = true;
+  programs.gh.enable = true;
+  programs.jujutsu = {
+    enable = true;
+    settings.ui.default-command = "log";
+  };
+
   programs.neovim = {
     enable = true;
     defaultEditor = true;
