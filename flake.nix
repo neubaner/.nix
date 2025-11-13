@@ -41,14 +41,16 @@
         inputs.nixos-wsl.nixosModules.default
         inputs.catppuccin.nixosModules.catppuccin
         inputs.home-manager.nixosModules.default
-        inputs.sops-nix.nixosModules.sops
       ];
     in {
       nixosConfigurations = {
         work = nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = { inherit inputs; };
-          modules = commonModules ++ [ ./hosts/work/configuration.nix ];
+          modules = commonModules ++ [
+            inputs.sops-nix.nixosModules.sops
+            ./hosts/work/configuration.nix
+          ];
         };
         home = nixpkgs.lib.nixosSystem {
           inherit system;
