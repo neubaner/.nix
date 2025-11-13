@@ -80,18 +80,19 @@
         "vi-mode"
         "tmux"
       ];
-      extraConfig = ''
-        # Vi mode configuration
-        VI_MODE_SET_CURSOR=true
+      extraConfig = # sh
+        ''
+          # Vi mode configuration
+          VI_MODE_SET_CURSOR=true
 
-        autoload -U select-quoted
-        zle -N select-quoted
-        for m in visual viopp; do
-            for c in {a,i}{\',\",\`}; do
-                bindkey -M $m $c select-quoted
-            done
-        done
-      '';
+          autoload -U select-quoted
+          zle -N select-quoted
+          for m in visual viopp; do
+              for c in {a,i}{\',\",\`}; do
+                  bindkey -M $m $c select-quoted
+              done
+          done
+        '';
     };
   };
 
@@ -117,20 +118,21 @@
       pkgs.tmuxPlugins.weather
     ];
 
-    extraConfig = ''
-      # True color
-      set-option -sa terminal-overrides ",xterm*:Tc"
+    extraConfig = # tmux
+      ''
+        # True color
+        set-option -sa terminal-overrides ",xterm*:Tc"
 
-      # Options
-      set-window-option -g pane-base-index 1
-      set-option -g renumber-windows on
+        # Options
+        set-window-option -g pane-base-index 1
+        set-option -g renumber-windows on
 
-      # Shift Control vim keys to switch windows
-      bind -n S-Left previous-window
-      bind -n S-Right next-window
-      bind -n C-S-Left swap-window -t -1\; select-window -t -1
-      bind -n C-S-Right swap-window -t +1\; select-window -t +1
-    '';
+        # Shift Control vim keys to switch windows
+        bind -n S-Left previous-window
+        bind -n S-Right next-window
+        bind -n C-S-Left swap-window -t -1\; select-window -t -1
+        bind -n C-S-Right swap-window -t +1\; select-window -t +1
+      '';
   };
 
   programs.java = {
@@ -143,22 +145,23 @@
     enable = true;
     # Neovim config is not handled by nix
     nvim.enable = false;
-    tmux.extraConfig = ''
-      set -g @catppuccin_window_status_style "rounded"
+    tmux.extraConfig = # tmux
+      ''
+        set -g @catppuccin_window_status_style "rounded"
 
-      # Display only the base name of the current path the terminal is currently on
-      set -g @catppuccin_window_text " #{b:pane_current_path}"
-      set -g @catppuccin_window_current_text " #{b:pane_current_path}"
+        # Display only the base name of the current path the terminal is currently on
+        set -g @catppuccin_window_text " #{b:pane_current_path}"
+        set -g @catppuccin_window_current_text " #{b:pane_current_path}"
 
-      set -g status-right-length 100
-      set -g status-left-length 100
-      set -g status-left ""
-      set -g status-right "#{E:@catppuccin_status_application}"
-      set -agF status-right "#{E:@catppuccin_status_cpu}"
-      set -ag status-right "#{E:@catppuccin_status_session}"
-      set -agF status-right "#{E:@catppuccin_status_weather}"
-      set -ag status-right "#{E:@catppuccin_status_uptime}"
-    '';
+        set -g status-right-length 100
+        set -g status-left-length 100
+        set -g status-left ""
+        set -g status-right "#{E:@catppuccin_status_application}"
+        set -agF status-right "#{E:@catppuccin_status_cpu}"
+        set -ag status-right "#{E:@catppuccin_status_session}"
+        set -agF status-right "#{E:@catppuccin_status_weather}"
+        set -ag status-right "#{E:@catppuccin_status_uptime}"
+      '';
   };
 
   programs.home-manager.enable = true;

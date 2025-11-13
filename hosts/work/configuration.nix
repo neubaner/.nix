@@ -27,18 +27,20 @@
         secrets."vcs/user/email" = { };
 
         templates = {
-          git-config.content = ''
-            [user]
-            name = ${config.sops.placeholder."vcs/user/name"}
-            email = ${config.sops.placeholder."vcs/user/email"}
-          '';
+          git-config.content = # gitconfig
+            ''
+              [user]
+              name = ${config.sops.placeholder."vcs/user/name"}
+              email = ${config.sops.placeholder."vcs/user/email"}
+            '';
 
           jujutsu-config = {
-            content = ''
-              [user]
-              name = "${config.sops.placeholder."vcs/user/name"}"
-              email = "${config.sops.placeholder."vcs/user/email"}"
-            '';
+            content = # toml
+              ''
+                [user]
+                name = "${config.sops.placeholder."vcs/user/name"}"
+                email = "${config.sops.placeholder."vcs/user/email"}"
+              '';
             path = "${config.xdg.configHome}/jj/conf.d/user.toml";
           };
         };
