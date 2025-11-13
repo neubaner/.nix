@@ -8,6 +8,7 @@
     pkgs.unzip
     pkgs.vectorcode
     pkgs.curl
+    pkgs.jq
 
     # LSPs, formaters and linters
     pkgs.lua-language-server
