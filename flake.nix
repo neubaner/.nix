@@ -4,6 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
+    dotnet-8_0_404-nixpkgs.url =
+      "github:NixOs/nixpkgs/aa319c6f1e150efc6c21326979d40088c28564a1";
+
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nixos-wsl = {
@@ -36,7 +39,19 @@
     let
       system = "x86_64-linux";
       commonModules = [
-        { nixpkgs.overlays = [ inputs.jujutsu.overlays.default ]; }
+        {
+          nixpkgs.overlays = [
+            inputs.jujutsu.overlays.default
+            (final: prev: {
+              dotnetCorePackages = prev.dotnetCorePackages // {
+                combinePackages =
+                  inputs.dotnet-8_0_404-nixpkgs.legacyPackages.${prev.system}.dotnetCorePackages.combinePackages;
+                sdk_8_0_404 =
+                  inputs.dotnet-8_0_404-nixpkgs.legacyPackages.${prev.system}.dotnetCorePackages.sdk_8_0;
+              };
+            })
+          ];
+        }
         ./hosts/common.nix
         inputs.nixos-wsl.nixosModules.default
         inputs.catppuccin.nixosModules.catppuccin

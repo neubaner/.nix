@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
 
@@ -10,17 +10,23 @@
     pkgs.curl
     pkgs.jq
 
-    # LSPs, formaters and linters
+    # LSPs, formaters, linters and text editor support
     pkgs.lua-language-server
     pkgs.stylua
     pkgs.jdt-language-server
     pkgs.nil
+    pkgs.lua51Packages.lua
+    pkgs.lua51Packages.luarocks
 
     # Language support
     pkgs.temurin-bin-21
-    pkgs.clang
     pkgs.nodejs
-    (with pkgs.dotnetCorePackages; combinePackages [ sdk_8_0 sdk_10_0 ])
+    pkgs.python3
+    (lib.hiPrio pkgs.clang)
+    pkgs.gcc
+    pkgs.gnumake
+    (with pkgs.dotnetCorePackages;
+      combinePackages [ sdk_8_0 sdk_8_0_404 sdk_10_0 ])
   ];
 
   home.file = {
