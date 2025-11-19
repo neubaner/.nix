@@ -17,6 +17,7 @@
     pkgs.nil
     pkgs.lua51Packages.lua
     pkgs.lua51Packages.luarocks
+    pkgs.tree-sitter
 
     # Language support
     pkgs.temurin-bin-21
@@ -92,7 +93,7 @@
         "vi-mode"
         "tmux"
       ];
-      extraConfig = # sh
+      extraConfig = # zsh
         ''
           # Vi mode configuration
           VI_MODE_SET_CURSOR=true
