@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
+    rem-bash = {
+      url = "github:neubaner/rem-bash";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     dotnet-8_0_404-nixpkgs.url =
       "github:NixOs/nixpkgs/aa319c6f1e150efc6c21326979d40088c28564a1";
 
@@ -42,6 +47,7 @@
         {
           nixpkgs.overlays = [
             inputs.jujutsu.overlays.default
+            inputs.rem-bash.overlays.default
             (final: prev: {
               dotnetCorePackages = prev.dotnetCorePackages // {
                 combinePackages =

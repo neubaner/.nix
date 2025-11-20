@@ -16,6 +16,7 @@
     pkgs.stylua
     pkgs.jdt-language-server
     pkgs.nil
+    pkgs.clang-tools
     pkgs.lua51Packages.lua
     pkgs.lua51Packages.luarocks
     pkgs.tree-sitter
@@ -27,6 +28,7 @@
     (lib.hiPrio pkgs.clang)
     pkgs.gcc
     pkgs.gnumake
+    pkgs.man-pages
     (with pkgs.dotnetCorePackages;
       combinePackages [ sdk_8_0 sdk_8_0_404 sdk_10_0 ])
   ];
