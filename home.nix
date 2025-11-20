@@ -9,6 +9,7 @@
     pkgs.vectorcode
     pkgs.curl
     pkgs.jq
+    pkgs.xdg-utils
 
     # LSPs, formaters, linters and text editor support
     pkgs.lua-language-server
@@ -101,9 +102,9 @@
           autoload -U select-quoted
           zle -N select-quoted
           for m in visual viopp; do
-              for c in {a,i}{\',\",\`}; do
-                  bindkey -M $m $c select-quoted
-              done
+            for c in a\' i\' a\" i\" a\` i\`; do
+                bindkey -M $m $c select-quoted
+            done
           done
         '';
     };
