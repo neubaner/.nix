@@ -23,7 +23,8 @@
         #
         # This makes my experience 100x times better when I use nvim's :GBrowse or I need to authenticate via browser :)
         remoteBrowserScript =
-          pkgs.writeShellScriptBin "remote-browser-script" ''
+          let secretPath = config.sops.secrets."rembash/secret".path;
+          in pkgs.writeShellScriptBin "remote-browser-script" ''
             set -euo pipefail
 
             if [ $# -eq 0 ]; then
@@ -34,7 +35,7 @@
               # Trim whitespaces in the url
               url=$(echo "$url" | xargs)
               echo "Opening '$url'"
-              echo "explorer.exe $url" | ${pkgs.netcat}/bin/nc 127.0.0.1 1337
+              cat ${secretPath} <(printf 'explorer.exe %s\n' $url) | ${pkgs.netcat}/bin/nc 127.0.0.1 1337
             done
           '';
       in {
@@ -44,6 +45,7 @@
           defaultSopsFormat = "yaml";
           secrets."vcs/user/name" = { };
           secrets."vcs/user/email" = { };
+          secrets."rembash/secret" = { sopsFile = ../../secrets/rembash.yaml; };
 
           templates = {
             git-config.content = # gitconfig

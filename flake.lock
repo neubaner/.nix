@@ -203,7 +203,6 @@
       },
       "original": {
         "owner": "neubaner",
-        "ref": "secret",
         "repo": "rem-bash",
         "type": "github"
       }
