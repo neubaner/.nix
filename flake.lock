@@ -194,15 +194,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1763699947,
-        "narHash": "sha256-DLptnwiC2lDR6fTfdXgaoNrdPH9RXcSBin/If/0cy0s=",
+        "lastModified": 1764533924,
+        "narHash": "sha256-o2zTS/Oc1yekScTvTqVSZmodBqmV2Vg7HVXajfkt88M=",
         "owner": "neubaner",
         "repo": "rem-bash",
-        "rev": "a5a513206dc44a21590e95daba937807e7a4dc07",
+        "rev": "75ab18d2f295cd4888447855c5da34e772439300",
         "type": "github"
       },
       "original": {
         "owner": "neubaner",
+        "ref": "secret",
         "repo": "rem-bash",
         "type": "github"
       }

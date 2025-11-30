@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     rem-bash = {
-      url = "github:neubaner/rem-bash";
+      url = "github:neubaner/rem-bash/secret";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
