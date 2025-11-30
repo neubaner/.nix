@@ -31,7 +31,10 @@
             fi
 
             for url in "$@"; do
-              echo "explorer.exe $url\n" | ${pkgs.netcat}/bin/nc 127.0.0.1 1337
+              # Trim whitespaces in the url
+              url=$(echo "$url" | xargs)
+              echo "Opening '$url'"
+              echo "explorer.exe $url" | ${pkgs.netcat}/bin/nc 127.0.0.1 1337
             done
           '';
       in {
