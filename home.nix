@@ -1,4 +1,19 @@
-{ pkgs, lib, ... }: {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
+  mono-with-msbuild = pkgs.callPackage ./mono-with-msbuild.nix { };
+  msbuildPath = "${pkgs.msbuild}/lib/mono/msbuild/Current/bin";
+  nuget-restore =
+    pkgs.writeShellScriptBin "nuget-restore" # bash
+      ''
+        exec ${pkgs.nuget}/bin/nuget restore "$@" -MSBuildPath ${msbuildPath}
+      '';
+in
+{
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
 
@@ -8,29 +23,55 @@
     pkgs.unzip
     pkgs.vectorcode
     pkgs.curl
+    pkgs.wget
     pkgs.jq
     pkgs.xdg-utils
+    pkgs.opencode
+    pkgs.icu
+    pkgs.tmux-sessionizer
+    pkgs.perf
+    pkgs.file
 
     # LSPs, formaters, linters and text editor support
     pkgs.lua-language-server
     pkgs.stylua
     pkgs.jdt-language-server
     pkgs.nil
+    pkgs.nixfmt
     pkgs.clang-tools
     pkgs.lua51Packages.lua
     pkgs.lua51Packages.luarocks
     pkgs.tree-sitter
 
+    # Scala
+    pkgs.scala
+    pkgs.scala-cli
+    pkgs.sbt
+    pkgs.coursier
+    pkgs.scalafmt
+
     # Language support
-    pkgs.temurin-bin-21
+    (lib.hiPrio pkgs.temurin-bin-21)
     pkgs.nodejs
     pkgs.python3
     (lib.hiPrio pkgs.clang)
     pkgs.gcc
     pkgs.gnumake
     pkgs.man-pages
-    (with pkgs.dotnetCorePackages;
-      combinePackages [ sdk_8_0 sdk_8_0_404 sdk_10_0 ])
+    (
+      with pkgs.dotnetCorePackages;
+      combinePackages [
+        sdk_8_0
+        sdk_10_0
+      ]
+    )
+    mono-with-msbuild
+    pkgs.nuget
+    nuget-restore
+
+    # Jebrains
+    pkgs.jetbrains.rider
+    pkgs.jetbrains.jdk
   ];
 
   home.file = {
@@ -39,11 +80,31 @@
     # jdtls in neovim. Lombok is added as a javaagent to jdtls so it can resolve lombok
     # annotations
     ".jdks/temurin-8".source = pkgs.temurin-bin-8;
+    ".jdks/temurin-11".source = pkgs.temurin-bin-11;
     ".jdks/temurin-21".source = pkgs.temurin-bin-21;
     ".jdks/lombok".source = pkgs.lombok;
+    "${config.xdg.configHome}/opencode/opencode.json".text = # json
+      ''
+        {
+          "$schema": "https://opencode.ai/config.json",
+          "model": "github-copilot/claude-opus-4.6",
+          "small_model": "github-copilot/claude-sonnet-4.6",
+          "keybinds": {
+            "input_newline": "return",
+            "input_submit": "ctrl+s"
+          }
+        }
+      '';
   };
 
-  home.sessionVariables = { MANPAGER = "nvim +Man!"; };
+  home.sessionVariables = {
+    MANPAGER = "nvim +Man!";
+    DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_10_0}/share/dotnet";
+  };
+
+  home.sessionPath = [
+    "$HOME/.dotnet/tools"
+  ];
 
   # NOTE: The user is configured in the host module
   programs.git.enable = true;
@@ -52,8 +113,14 @@
     enable = true;
     settings = {
       ui.default-command = "log";
-      aliases.rebase-trunk =
-        [ "rebase" "-s" "needs_rebase()" "-d" "trunk()" "--skip-emptied" ];
+      aliases.rebase-trunk = [
+        "rebase"
+        "-s"
+        "needs_rebase()"
+        "-d"
+        "trunk()"
+        "--skip-emptied"
+      ];
       revset-aliases."needs_rebase()" = "roots(trunk()..) & mutable() & mine()";
     };
   };
@@ -115,7 +182,9 @@
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    settings = { add_newline = false; };
+    settings = {
+      add_newline = false;
+    };
   };
 
   programs.tmux = {

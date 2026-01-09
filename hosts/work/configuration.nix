@@ -1,10 +1,13 @@
-{ inputs, ... }: {
+{ inputs, ... }:
+{
   services.openssh = {
     enable = true;
-    listenAddresses = [{
-      addr = "0.0.0.0";
-      port = 2222;
-    }];
+    listenAddresses = [
+      {
+        addr = "0.0.0.0";
+        port = 2222;
+      }
+    ];
     settings = {
       PasswordAuthentication = true;
       PermitRootLogin = "no";
@@ -13,9 +16,16 @@
     };
   };
 
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "neubaner" ];
+  };
+
   home-manager.users.neubaner.imports = [
     inputs.sops-nix.homeManagerModules.sops
-    ({ config, pkgs, ... }:
+    (
+      { config, pkgs, ... }:
       let
         # I have an small C server running on my home machine that accepts and executes bash commands.
         # The server is proxied to this remote machine via SSH RemoteForward on port 1337.
@@ -23,8 +33,10 @@
         #
         # This makes my experience 100x times better when I use nvim's :GBrowse or I need to authenticate via browser :)
         remoteBrowserScript =
-          let secretPath = config.sops.secrets."rembash/secret".path;
-          in pkgs.writeShellScriptBin "remote-browser-script" ''
+          let
+            secretPath = config.sops.secrets."rembash/secret".path;
+          in
+          pkgs.writeShellScriptBin "remote-browser-script" ''
             set -euo pipefail
 
             if [ $# -eq 0 ]; then
@@ -38,14 +50,17 @@
               cat ${secretPath} <(printf 'explorer.exe %s\n' $url) | ${pkgs.netcat}/bin/nc 127.0.0.1 1337
             done
           '';
-      in {
+      in
+      {
         sops = {
           age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
           defaultSopsFile = ../../secrets/work.yaml;
           defaultSopsFormat = "yaml";
           secrets."vcs/user/name" = { };
           secrets."vcs/user/email" = { };
-          secrets."rembash/secret" = { sopsFile = ../../secrets/rembash.yaml; };
+          secrets."rembash/secret" = {
+            sopsFile = ../../secrets/rembash.yaml;
+          };
 
           templates = {
             git-config.content = # gitconfig
@@ -68,12 +83,20 @@
         };
 
         programs.git = {
-          includes = [{ path = config.sops.templates.git-config.path; }];
+          includes = [ { path = config.sops.templates.git-config.path; } ];
         };
 
         home.sessionVariables = {
           BROWSER = "${remoteBrowserScript}/bin/remote-browser-script";
         };
-      })
+
+        home.packages = [
+          pkgs.azure-cli
+          pkgs.flyway
+          pkgs.grpcurl
+          pkgs.terraform
+        ];
+      }
+    )
   ];
 }
