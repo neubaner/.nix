@@ -2,7 +2,7 @@
   description = "My NixOS Setup";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     rem-bash = {
       url = "github:neubaner/rem-bash";
@@ -17,17 +17,26 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     jujutsu = {
-      url = "github:jj-vcs/jj/v0.37.0";
+      url = "github:jj-vcs/jj/v0.41.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixpkgs-opencode-v1_14_48 = {
+      url = "github:NixOS/nixpkgs/22a867f12cf98aa49c17d92fdfdff084b888bb7c";
+    };
+
+    opencode = {
+      url = "github:anomalyco/opencode/v1.14.21";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     catppuccin = {
-      url = "github:catppuccin/nix/release-25.11";
+      url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -53,32 +62,30 @@
               "terraform"
               "1password"
               "1password-cli"
-              "rider"
             ];
           nixpkgs.overlays = [
             inputs.jujutsu.overlays.default
             inputs.rem-bash.overlays.default
+            # inputs.opencode.overlays.default
             # inputs.neovim-nightly-overlay.overlays.default
             (final: prev: {
-              opencode = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.opencode;
-              neovim = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim;
-              neovim-unwrapped = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim-unwrapped;
-            })
-            (final: prev: {
-              jetbrains = prev.jetbrains // {
-                rider = prev.jetbrains.rider.overrideAttrs (old: {
-                  src = prev.fetchurl {
-                    url = "https://download.jetbrains.com/rider/JetBrains.Rider-2026.1.0.1.tar.gz";
-                    hash = "sha256-moIysTTsq7abpQfNh1Bc5Pk6VQgJIT6erbyHsUXf15Y=";
-                  };
-                  version = "2026.0.1";
-                  autoPatchelfIgnoreMissingDeps = (old.autoPatchelfIgnoreMissingDeps or [ ]) ++ [
-                    "libcrypt.so.1"
-                    "libssl.so.1.1"
-                    "libcrypto.so.1.1"
-                  ];
-                });
-              };
+              opencode = inputs.nixpkgs-opencode-v1_14_48.legacyPackages.${prev.system}.opencode;
+              # neovim = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim;
+              # neovim-unwrapped = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim-unwrapped;
+              # bun = prev.bun.overrideAttrs (
+              #   old:
+              #   let
+              #     version = "1.3.14";
+              #   in
+              #   {
+              #     inherit version;
+              #     # Opencode requires bun 1.3.14
+              #     src = prev.fetchurl {
+              #       url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
+              #       hash = "sha256-lR7iruhV8IWVruxiJSJqKY0/6oOj3NZGXAnLzN9+hI8=";
+              #     };
+              #   }
+              # );
             })
           ];
         }

@@ -1,5 +1,7 @@
 { inputs, ... }:
 {
+  wsl.enable = true;
+  wsl.defaultUser = "neubaner";
   services.openssh = {
     enable = true;
     listenAddresses = [
@@ -14,12 +16,6 @@
       PubkeyAuthentication = true;
       AllowTcpForwarding = "yes";
     };
-  };
-
-  programs._1password.enable = true;
-  programs._1password-gui = {
-    enable = true;
-    polkitPolicyOwners = [ "neubaner" ];
   };
 
   home-manager.users.neubaner.imports = [

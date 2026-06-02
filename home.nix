@@ -26,13 +26,17 @@ in
     pkgs.wget
     pkgs.jq
     pkgs.xdg-utils
-    pkgs.opencode
     pkgs.icu
     pkgs.tmux-sessionizer
     pkgs.perf
     pkgs.file
+    pkgs.lsof
+    pkgs.tree
+    pkgs.duckdb
+    pkgs.bun
 
     # LSPs, formaters, linters and text editor support
+    pkgs.neovim
     pkgs.lua-language-server
     pkgs.stylua
     pkgs.jdt-language-server
@@ -68,10 +72,6 @@ in
     mono-with-msbuild
     pkgs.nuget
     nuget-restore
-
-    # Jebrains
-    pkgs.jetbrains.rider
-    pkgs.jetbrains.jdk
   ];
 
   home.file = {
@@ -83,28 +83,22 @@ in
     ".jdks/temurin-11".source = pkgs.temurin-bin-11;
     ".jdks/temurin-21".source = pkgs.temurin-bin-21;
     ".jdks/lombok".source = pkgs.lombok;
-    "${config.xdg.configHome}/opencode/opencode.json".text = # json
-      ''
-        {
-          "$schema": "https://opencode.ai/config.json",
-          "model": "github-copilot/claude-opus-4.6",
-          "small_model": "github-copilot/claude-sonnet-4.6",
-          "keybinds": {
-            "input_newline": "return",
-            "input_submit": "ctrl+s"
-          }
-        }
-      '';
   };
 
   home.sessionVariables = {
     MANPAGER = "nvim +Man!";
     DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_10_0}/share/dotnet";
+    EDITOR = "nvim";
   };
 
   home.sessionPath = [
     "$HOME/.dotnet/tools"
   ];
+
+  xdg.configFile = {
+    "nvim".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.config/nvim";
+  };
 
   # NOTE: The user is configured in the host module
   programs.git.enable = true;
@@ -126,9 +120,39 @@ in
   };
 
   programs.neovim = {
-    enable = true;
+    enable = false;
     defaultEditor = true;
+
     vimAlias = true;
+    vimdiffAlias = true;
+
+    # withPython3 = false;
+    # withNodeJs = false;
+    # withRuby = false;
+  };
+
+  programs.opencode = {
+    enable = true;
+    settings = {
+      autoupdate = true;
+      model = "github-copilot/claude-opus-4.6";
+      small_model = "github-copilot/claude-sonnet-4.6";
+      default_agent = "plan";
+      agent = {
+        plan = {
+          model = "github-copilot/claude-opus-4.6";
+        };
+        build = {
+          model = "github-copilot/claude-sonnet-4.6";
+        };
+      };
+    };
+    tui = {
+      keybinds = {
+        input_newline = "return";
+        input_submit = "ctrl+s";
+      };
+    };
   };
 
   programs.zsh = {
@@ -136,19 +160,10 @@ in
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
-    plugins = [
-      # # Allows zsh to be used with nix-shell
-      # {
-      #   name = "zsh-nix-shell";
-      #   file = "nix-shell.plugin.zsh";
-      #   src = pkgs.fetchFromGitHub {
-      #     owner = "chisui";
-      #     repo = "zsh-nix-shell";
-      #     rev = "v0.8.0";
-      #     sha256 = "1lzrn0n4fxfcgg65v0qhnj7wnybybqzs4adz7xsrkgmcsr0ii8b7";
-      #   };
-      # }
-    ];
+    shellAliases = {
+      vim = "nvim";
+      vimdiff = "nvim -d";
+    };
     oh-my-zsh = {
       enable = true;
       plugins = [
@@ -177,6 +192,14 @@ in
           done
         '';
     };
+    initContent =
+      lib.mkAfter # zsh
+        ''
+          # Keybindings
+          autoload -U edit-command-line
+          zle -N edit-command-line
+          bindkey '\C-e' edit-command-line
+        '';
   };
 
   programs.starship = {
