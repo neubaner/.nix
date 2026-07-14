@@ -134,16 +134,16 @@ in
   programs.opencode = {
     enable = true;
     settings = {
-      autoupdate = true;
-      model = "github-copilot/claude-opus-4.6";
-      small_model = "github-copilot/claude-sonnet-4.6";
+      autoupdate = false;
+      model = "anthropic/claude-opus-4-8";
+      small_model = "anthropic/claude-sonnet-4-6";
       default_agent = "plan";
       agent = {
         plan = {
-          model = "github-copilot/claude-opus-4.6";
+          model = "anthropic/claude-opus-4-8";
         };
         build = {
-          model = "github-copilot/claude-sonnet-4.6";
+          model = "anthropic/claude-sonnet-4-6";
         };
       };
     };
