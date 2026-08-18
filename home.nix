@@ -107,6 +107,7 @@ in
     enable = true;
     settings = {
       ui.default-command = "log";
+      remotes.origin.auto-track-created-bookmarks = "*";
       aliases.rebase-trunk = [
         "rebase"
         "-s"

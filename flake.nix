@@ -26,10 +26,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpkgs-opencode-v1_14_48 = {
-      url = "github:NixOS/nixpkgs/22a867f12cf98aa49c17d92fdfdff084b888bb7c";
-    };
-
     opencode = {
       url = "github:anomalyco/opencode/v1.14.21";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -69,7 +65,25 @@
             # inputs.opencode.overlays.default
             # inputs.neovim-nightly-overlay.overlays.default
             (final: prev: {
-              opencode = inputs.nixpkgs-opencode-v1_14_48.legacyPackages.${prev.system}.opencode;
+              opencode =
+                let
+                  opencodePackage =
+                    inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.opencode;
+                in
+                final.runCommand opencodePackage.name
+                  {
+                    nativeBuildInputs = [ final.patchelf ];
+                    inherit (opencodePackage) meta;
+                  }
+                  # Opencode fails to compile on WSL2, so it must be re-patched
+                  ''
+                    cp -a ${opencodePackage} $out
+                    chmod -R u+w $out
+                    find $out -type f -exec sed -i "s|${opencodePackage}|$out|g" {} +
+                    patchelf --set-interpreter "$(patchelf --print-interpreter "$out/bin/.opencode-wrapped")" "$out/bin/.opencode-wrapped"
+                  '';
+
+              # inputs.nixpkgs-opencode-v1_14_48.legacyPackages.${prev.system}.opencode;
               # neovim = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim;
               # neovim-unwrapped = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim-unwrapped;
               # bun = prev.bun.overrideAttrs (
