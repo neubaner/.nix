@@ -34,6 +34,7 @@ in
     pkgs.tree
     pkgs.duckdb
     pkgs.bun
+    pkgs.gnupg
 
     # LSPs, formaters, linters and text editor support
     pkgs.neovim

@@ -86,6 +86,12 @@
           BROWSER = "${remoteBrowserScript}/bin/remote-browser-script";
         };
 
+        services.gpg-agent = {
+          enable = true;
+          enableSshSupport = false;
+          pinentry.package = pkgs.pinentry-curses;
+        };
+
         home.packages = [
           pkgs.azure-cli
           pkgs.flyway
