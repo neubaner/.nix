@@ -4,11 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
-    rem-bash = {
-      url = "github:neubaner/rem-bash";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nixos-wsl = {
@@ -26,11 +21,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    opencode = {
-      url = "github:anomalyco/opencode/v1.14.21";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     catppuccin = {
       url = "github:catppuccin/nix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,105 +34,29 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       ...
     }@inputs:
     let
-      system = "x86_64-linux";
-      commonModules = [
-        {
-          nixpkgs.config.allowUnfreePredicate =
-            pkg:
-            builtins.elem (nixpkgs.lib.getName pkg) [
-              "terraform"
-              "1password"
-              "1password-cli"
-            ];
-          nixpkgs.overlays = [
-            inputs.jujutsu.overlays.default
-            inputs.rem-bash.overlays.default
-            # inputs.opencode.overlays.default
-            # inputs.neovim-nightly-overlay.overlays.default
-            (final: prev: {
-              opencode =
-                let
-                  opencodePackage =
-                    inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.opencode;
-                in
-                final.runCommand opencodePackage.name
-                  {
-                    nativeBuildInputs = [ final.patchelf ];
-                    inherit (opencodePackage) meta;
-                  }
-                  # Opencode fails to compile on WSL2, so it must be re-patched
-                  ''
-                    cp -a ${opencodePackage} $out
-                    chmod -R u+w $out
-                    find $out -type f -exec sed -i "s|${opencodePackage}|$out|g" {} +
-                    patchelf --set-interpreter "$(patchelf --print-interpreter "$out/bin/.opencode-wrapped")" "$out/bin/.opencode-wrapped"
-                  '';
-
-              # inputs.nixpkgs-opencode-v1_14_48.legacyPackages.${prev.system}.opencode;
-              # neovim = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim;
-              # neovim-unwrapped = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.neovim-unwrapped;
-              # bun = prev.bun.overrideAttrs (
-              #   old:
-              #   let
-              #     version = "1.3.14";
-              #   in
-              #   {
-              #     inherit version;
-              #     # Opencode requires bun 1.3.14
-              #     src = prev.fetchurl {
-              #       url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-linux-x64.zip";
-              #       hash = "sha256-lR7iruhV8IWVruxiJSJqKY0/6oOj3NZGXAnLzN9+hI8=";
-              #     };
-              #   }
-              # );
-            })
-          ];
-        }
-        ./hosts/common.nix
-        inputs.catppuccin.nixosModules.catppuccin
-        inputs.home-manager.nixosModules.default
+      overlays = [
+        inputs.jujutsu.overlays.default
+        (final: prev: {
+          opencode = inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.opencode;
+        })
       ];
+      mkHost = import ./lib/mkHost.nix { inherit overlays inputs nixpkgs; };
     in
     {
-      nixosConfigurations = {
-        work = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs; };
-          modules = commonModules ++ [
-            inputs.sops-nix.nixosModules.sops
-            inputs.nixos-wsl.nixosModules.default
-            ./hosts/work/configuration.nix
-          ];
-        };
-        home = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs; };
-          modules = commonModules ++ [
-            inputs.nixos-wsl.nixosModules.default
-            ./hosts/home/configuration.nix
-          ];
-        };
-        vm = nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = { inherit inputs; };
-          modules = commonModules ++ [
-            inputs.sops-nix.nixosModules.sops
-            (inputs: {
-              virtualisation.vmVariant = {
-                virtualisation = {
-                  memorySize = 2048;
-                  cores = 3;
-                  graphics = false;
-                };
-              };
-            })
-          ];
-        };
+      nixosConfigurations.work = mkHost "wsl-work" {
+        system = "x86_64-linux";
+        user = "neubaner";
+        wsl = true;
+      };
+
+      nixosConfigurations.home = mkHost "wsl-home" {
+        system = "x86_64-linux";
+        user = "neubaner";
+        wsl = true;
       };
     };
 }

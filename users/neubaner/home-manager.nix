@@ -1,3 +1,4 @@
+{ inputs }:
 {
   config,
   pkgs,
@@ -5,7 +6,7 @@
   ...
 }:
 let
-  mono-with-msbuild = pkgs.callPackage ./mono-with-msbuild.nix { };
+  mono-with-msbuild = pkgs.callPackage ../../pkgs/mono-with-msbuild.nix { };
   msbuildPath = "${pkgs.msbuild}/lib/mono/msbuild/Current/bin";
   nuget-restore =
     pkgs.writeShellScriptBin "nuget-restore" # bash
@@ -14,6 +15,9 @@ let
       '';
 in
 {
+  imports = [
+    inputs.catppuccin.homeModules.catppuccin
+  ];
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
 
@@ -96,6 +100,8 @@ in
     "$HOME/.dotnet/tools"
   ];
 
+  home.shell.enableZshIntegration = true;
+
   xdg.configFile = {
     "nvim".source =
       config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.config/nvim";
@@ -137,15 +143,15 @@ in
     enable = true;
     settings = {
       autoupdate = false;
-      model = "anthropic/claude-opus-4-8";
-      small_model = "anthropic/claude-sonnet-4-6";
+      model = "anthropic/claude-opus-5-5";
+      small_model = "anthropic/claude-haiku-5-5";
       default_agent = "plan";
       agent = {
         plan = {
-          model = "anthropic/claude-opus-4-8";
+          model = "anthropic/claude-opus-5-5";
         };
         build = {
-          model = "anthropic/claude-sonnet-4-6";
+          model = "anthropic/claude-sonnet-5-5";
         };
       };
     };
@@ -206,7 +212,6 @@ in
 
   programs.starship = {
     enable = true;
-    enableZshIntegration = true;
     settings = {
       add_newline = false;
     };
