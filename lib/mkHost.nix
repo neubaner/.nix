@@ -7,12 +7,13 @@ name:
 {
   system,
   user,
+  userProfile,
   wsl ? false,
 }:
 let
   hostConfig = ../hosts/${name}.nix;
-  userOSConfig = ../users/${user}/nixos.nix;
-  userHMConfig = ../users/${user}/home-manager.nix;
+  userOSConfig = ../users/${userProfile}/nixos.nix;
+  userHMConfig = ../users/${userProfile}/home-manager.nix;
   inherit (nixpkgs.lib) optionals;
 in
 nixpkgs.lib.nixosSystem {

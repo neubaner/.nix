@@ -62,6 +62,7 @@
       nixosConfigurations.hyperv-home = mkHost "hyperv-home" {
         system = "x86_64-linux";
         user = "neubaner";
+        userProfile = "gamedev";
       };
     };
 }
