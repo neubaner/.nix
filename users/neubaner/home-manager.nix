@@ -108,7 +108,11 @@ in
   };
 
   # NOTE: The user is configured in the host module
-  programs.git.enable = true;
+  programs.git = {
+    enable = true;
+    settings.commit.gpgsign = true;
+  };
+
   programs.gh.enable = true;
   programs.jujutsu = {
     enable = true;
@@ -124,6 +128,11 @@ in
         "--skip-emptied"
       ];
       revset-aliases."needs_rebase()" = "roots(trunk()..) & mutable() & mine()";
+      signing = {
+        behavior = "drop";
+        backend = "gpg";
+      };
+      git.sign-on-push = true;
     };
   };
 
