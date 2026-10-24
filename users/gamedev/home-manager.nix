@@ -38,7 +38,6 @@
     pkgs.tree-sitter
 
     # UI
-    pkgs.kitty
     pkgs.dmenu
     pkgs.st
 
@@ -203,10 +202,17 @@
       '';
   };
 
+  programs.kitty = {
+    enable = true;
+    font.name = "Iosevka Nerd Font Mono";
+    font.package = pkgs.nerd-fonts.iosevka;
+    font.size = 14;
+  };
+
   programs.home-manager.enable = true;
 
   xresources.properties = {
-    "Xft.dpi" = 192;
+    "Xft.dpi" = 144;
   };
 
   # This value determines the Home Manager release that your configuration is
