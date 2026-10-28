@@ -40,9 +40,16 @@
     let
       overlays = [
         inputs.jujutsu.overlays.default
-        (final: prev: {
-          opencode = inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.opencode;
-        })
+        (
+          final: prev:
+          let
+            unstable = inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system};
+          in
+          {
+            opencode = unstable.opencode;
+            godot = unstable.godot;
+          }
+        )
       ];
       mkHost = import ./lib/mkHost.nix { inherit overlays inputs nixpkgs; };
     in
