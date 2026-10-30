@@ -3,9 +3,8 @@
 set -euo pipefail
 
 aws_profile=$1
-shift
-secret_key_path=$1
-shift
+secret_key_path=$2
+shift 2
 
 [[ "${aws_profile}" ]]
 [[ "${secret_key_path}" ]]

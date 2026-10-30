@@ -182,6 +182,7 @@
     enable = true;
     # Neovim config is not handled by nix
     nvim.enable = false;
+    cache.enable = true;
     tmux.extraConfig = # tmux
       ''
         set -g @catppuccin_window_status_style "rounded"
@@ -218,6 +219,7 @@
   programs.home-manager.enable = true;
 
   xresources.properties = {
+    # "Xft.dpi" = 96;
     "Xft.dpi" = 144;
   };
 

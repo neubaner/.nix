@@ -40,6 +40,7 @@
     let
       overlays = [
         inputs.jujutsu.overlays.default
+        (import ./overlays/iosevka.nix)
         (
           final: prev:
           let
