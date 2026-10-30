@@ -7,7 +7,7 @@ name:
 {
   system,
   user,
-  userProfile,
+  userProfile ? user,
   wsl ? false,
 }:
 let
