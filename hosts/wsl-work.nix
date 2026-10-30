@@ -2,6 +2,7 @@
 {
   imports = [
     ./wsl-shared.nix
+    ./shared.nix
   ];
   home-manager.users.${currentSystemUser}.imports = [
     inputs.sops-nix.homeManagerModules.sops

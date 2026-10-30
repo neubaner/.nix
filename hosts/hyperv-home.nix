@@ -7,6 +7,7 @@
 }:
 {
   imports = [
+    ./shared.nix
     ./hardware/hyperv-home.nix
   ];
   nix = {
