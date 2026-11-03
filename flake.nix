@@ -17,7 +17,7 @@
     };
 
     jujutsu = {
-      url = "github:jj-vcs/jj/v0.45.1";
+      url = "github:jj-vcs/jj/v0.46.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -39,7 +39,11 @@
     }@inputs:
     let
       overlays = [
-        inputs.jujutsu.overlays.default
+        # The jj overlay does not select the required rust toolchain to build jj
+        # inputs.jujutsu.overlays.default
+        (final: prev: {
+          jujutsu = inputs.jujutsu.packages.${final.stdenv.hostPlatform.system}.default;
+        })
         (import ./overlays/iosevka.nix)
         (
           final: prev:
