@@ -1,21 +1,8 @@
-{
-  pkgs,
-  currentSystemUser,
-  ...
-}:
+{ currentSystemUser, ... }:
 {
   wsl = {
     enable = true;
     defaultUser = currentSystemUser;
-  };
-
-  nix = {
-    package = pkgs.nixVersions.latest;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-      keep-outputs = true
-      keep-derivations = true
-    '';
   };
 
   services.openssh = {

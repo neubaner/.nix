@@ -1,6 +1,15 @@
-{ ... }:
+{ pkgs, ... }:
 {
+  nix.package = pkgs.nixVersions.latest;
   nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    builders-use-substitutes = true;
+    keep-outputs = true;
+    keep-derivations = true;
+
     extra-substituters = [
       "https://neubaner-nix-cache.sfo3.cdn.digitaloceanspaces.com/nix-cache"
     ];

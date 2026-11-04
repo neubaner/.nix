@@ -10,18 +10,10 @@
     ./shared.nix
     ./hardware/hyperv-home.nix
   ];
-  nix = {
-    package = pkgs.nixVersions.latest;
-    settings.trusted-users = [
-      "root"
-      currentSystemUser
-    ];
-    extraOptions = ''
-      experimental-features = nix-command flakes
-      keep-outputs = true
-      keep-derivations = true
-    '';
-  };
+  nix.settings.trusted-users = [
+    "root"
+    currentSystemUser
+  ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
