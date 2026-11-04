@@ -264,6 +264,11 @@ in
     package = pkgs.temurin-bin-21;
   };
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   catppuccin = {
     flavor = "mocha";
     enable = true;
