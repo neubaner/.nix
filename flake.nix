@@ -62,12 +62,14 @@
       nixosConfigurations.work = mkHost "wsl-work" {
         system = "x86_64-linux";
         user = "neubaner";
+        hmProfile = "work";
         wsl = true;
       };
 
       nixosConfigurations.home = mkHost "wsl-home" {
         system = "x86_64-linux";
         user = "neubaner";
+        hmProfile = "personal";
         wsl = true;
       };
 

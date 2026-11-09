@@ -1,8 +1,8 @@
-{ inputs }:
 {
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 let
@@ -17,7 +17,9 @@ in
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
+    ./hm-profile.nix
   ];
+  profile = "work";
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
 
@@ -132,7 +134,6 @@ in
         behavior = "drop";
         backend = "gpg";
       };
-      git.sign-on-push = true;
     };
   };
 

@@ -9,6 +9,7 @@ name:
   user,
   userProfile ? user,
   wsl ? false,
+  hmProfile,
 }:
 let
   hostConfig = ../hosts/${name}.nix;
@@ -47,8 +48,10 @@ nixpkgs.lib.nixosSystem {
     {
       home-manager.useUserPackages = true;
       home-manager.useGlobalPkgs = true;
-      home-manager.users.${user} = import userHMConfig {
-        inherit inputs;
+      home-manager.extraSpecialArgs = { inherit inputs; };
+      home-manager.users.${user} = {
+        imports = [ userHMConfig ];
+        profile = hmProfile;
       };
     }
   ];
