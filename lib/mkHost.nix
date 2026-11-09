@@ -9,7 +9,7 @@ name:
   user,
   userProfile ? user,
   wsl ? false,
-  hmProfile,
+  hmProfile ? null,
 }:
 let
   hostConfig = ../hosts/${name}.nix;
@@ -51,8 +51,8 @@ nixpkgs.lib.nixosSystem {
       home-manager.extraSpecialArgs = { inherit inputs; };
       home-manager.users.${user} = {
         imports = [ userHMConfig ];
-        profile = hmProfile;
-      };
+      }
+      // (if hmProfile != null then { profile = hmProfile; } else { });
     }
   ];
 }
