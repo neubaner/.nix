@@ -92,23 +92,6 @@
   systemd.services.xrdp.serviceConfig.ExecStart =
     lib.mkForce "${pkgs.xrdp}/bin/xrdp --nodaemon --config /etc/xrdp/xrdp.ini";
 
-  home-manager.users.${currentSystemUser}.imports = [
-    (
-      let
-        user.name = "Guilherme Neubaner";
-        user.email = "guilherme.neubaner@gmail.com";
-      in
-      {
-        programs.git = {
-          settings = { inherit user; };
-        };
-        programs.jujutsu = {
-          settings = { inherit user; };
-        };
-      }
-    )
-  ];
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It's perfectly fine and recommended to leave

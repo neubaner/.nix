@@ -5,6 +5,10 @@
   inputs,
   ...
 }:
+let
+  user.name = "Guilherme Neubaner";
+  user.email = "guilherme.neubaner@gmail.com";
+in
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
@@ -58,12 +62,15 @@
       config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.dotfiles/.config/nvim";
   };
 
-  # NOTE: The user is configured in the host module
-  programs.git.enable = true;
   programs.gh.enable = true;
+  programs.git = {
+    enable = true;
+    settings = { inherit user; };
+  };
   programs.jujutsu = {
     enable = true;
     settings = {
+      inherit user;
       ui.default-command = "log";
       remotes.origin.auto-track-created-bookmarks = "*";
       aliases.rebase-trunk = [
@@ -182,7 +189,6 @@
     enable = true;
     # Neovim config is not handled by nix
     nvim.enable = false;
-    cache.enable = true;
     tmux.extraConfig = # tmux
       ''
         set -g @catppuccin_window_status_style "rounded"
