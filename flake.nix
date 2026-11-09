@@ -69,7 +69,7 @@
       nixosConfigurations.home = mkHost "wsl-home" {
         system = "x86_64-linux";
         user = "neubaner";
-        hmProfile = "personal";
+        userProfile = "gamedev";
         wsl = true;
       };
 
