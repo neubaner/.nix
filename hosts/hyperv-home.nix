@@ -9,6 +9,8 @@
   imports = [
     ./shared.nix
     ./hardware/hyperv-home.nix
+    ../hyperv-gpu/module.nix
+    ../hyperv-gpu/graphics-userspace.nix
   ];
   nix.settings.trusted-users = [
     "root"
@@ -84,6 +86,7 @@
   services.xrdp.openFirewall = true;
   services.xrdp.defaultWindowManager = toString (
     pkgs.writeShellScript "start-xrdp-dwm" ''
+      . /etc/hyperv-gpu/session-env.sh
       ${pkgs.xrdb}/bin/xrdb -merge "$HOME/.Xresources"
 
       exec ${pkgs.dbus}/bin/dbus-run-session -- \
