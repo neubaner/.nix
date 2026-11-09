@@ -19,7 +19,6 @@ in
     inputs.catppuccin.homeModules.catppuccin
     ./hm-profile.nix
   ];
-  profile = "work";
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
 
