@@ -13,7 +13,7 @@
     ];
 
     extra-trusted-public-keys = [
-      "neubaner-nix-cache:TWS3fTdupqj2EKXIV1VfwznQUu81CpoRRrx7W7Wd51w="
+      "neubaner-nix-cache:cOwII4fCtXdZT4ZYGI/M5Fq+NcNy3LIhgmwdKBOmCWg="
     ];
 
     require-sigs = true;
