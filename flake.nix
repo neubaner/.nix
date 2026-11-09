@@ -34,6 +34,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       ...
     }@inputs:
@@ -59,6 +60,11 @@
       mkHost = import ./lib/mkHost.nix { inherit overlays inputs nixpkgs; };
     in
     {
+      packages.x86_64-linux.hyperv-home-vhdx =
+        (self.nixosConfigurations.hyperv-home.extendModules {
+          modules = [ ./hosts/hyperv-home-image.nix ];
+        }).config.system.build.vhdx;
+
       nixosConfigurations.work = mkHost "wsl-work" {
         system = "x86_64-linux";
         user = "neubaner";

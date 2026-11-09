@@ -18,6 +18,13 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  boot.initrd.systemd.enable = true;
+  boot.initrd.systemd.repart.enable = true;
+  systemd.repart.partitions."20-root" = {
+    Type = "root";
+    GrowFileSystem = true;
+  };
+
   networking.useDHCP = false;
   networking.interfaces.eth0.useDHCP = false;
   networking.interfaces.eth0.ipv4.addresses = [
