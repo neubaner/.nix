@@ -17,7 +17,7 @@
     };
 
     jujutsu = {
-      url = "github:jj-vcs/jj/v0.46.0";
+      url = "github:jj-vcs/jj/v0.47.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
