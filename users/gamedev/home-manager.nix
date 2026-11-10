@@ -12,6 +12,7 @@ in
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
+    inputs.nix-index-database.homeModules.default
   ];
   home.username = "neubaner";
   home.homeDirectory = "/home/neubaner";
@@ -183,6 +184,8 @@ in
         bind -n C-S-Right swap-window -t +1\; select-window -t +1
       '';
   };
+
+  programs.nix-index-database.comma.enable = true;
 
   catppuccin = {
     flavor = "mocha";
