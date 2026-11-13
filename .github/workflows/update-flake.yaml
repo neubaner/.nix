@@ -1,0 +1,90 @@
+name: Update flake and publish NixOS builds
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-flake-and-publish
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            extra-substituters = ${{ vars.NIX_CACHE_URL }}
+            extra-trusted-public-keys = ${{ vars.NIX_CACHE_PUBLIC_KEY }}
+
+      - name: Update and commit flake.lock locally
+        shell: bash
+        run: |
+          nix flake update
+          git add -- flake.lock
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' \
+                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                commit -m 'chore: update flake.lock'
+          fi
+
+      - name: Build NixOS systems and Whiskers
+        shell: bash
+        run: |
+          nix eval --json .#nixosConfigurations --apply '
+            configs:
+              builtins.concatMap (host:
+                let
+                  prefix = ".#nixosConfigurations." + builtins.toJSON host + ".config";
+                  users = configs.${host}.config.home-manager.users or {};
+                  themedUsers = builtins.filter
+                    (user: users.${user} ? catppuccin.sources.whiskers)
+                    (builtins.attrNames users);
+                in
+                  [ (prefix + ".system.build.toplevel") ]
+                  ++ map (user:
+                    prefix + ".home-manager.users." + builtins.toJSON user
+                    + ".catppuccin.sources.whiskers"
+                  ) themedUsers
+              ) (builtins.attrNames configs)
+          ' | jq -er '.[]' > "$RUNNER_TEMP/nix-installables"
+
+          mapfile -t installables < "$RUNNER_TEMP/nix-installables"
+          nix build --no-link --print-out-paths -L "${installables[@]}" \
+            > "$RUNNER_TEMP/nix-output-paths"
+
+      - name: Publish to the binary cache
+        shell: bash
+        env:
+          NIX_CACHE_WRITE_URI: ${{ vars.NIX_CACHE_WRITE_URI }}
+          NIX_CACHE_SIGNING_KEY: ${{ secrets.NIX_CACHE_SIGNING_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          : "${NIX_CACHE_WRITE_URI:?Set the S3 cache write URI}"
+          : "${NIX_CACHE_SIGNING_KEY:?Set the cache signing key}"
+
+          key_file=$(mktemp)
+          trap 'rm -f "$key_file"' EXIT
+          printf '%s\n' "$NIX_CACHE_SIGNING_KEY" > "$key_file"
+
+          separator='?'
+          if [[ "$NIX_CACHE_WRITE_URI" == *\?* ]]; then
+            separator='&'
+          fi
+
+          nix copy --to "${NIX_CACHE_WRITE_URI}${separator}secret-key=${key_file}" \
+            --stdin < "$RUNNER_TEMP/nix-output-paths"
+
+      - name: Push the lockfile update
+        shell: bash
+        run: git push origin "HEAD:refs/heads/$GITHUB_REF_NAME"
